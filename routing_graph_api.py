@@ -23,6 +23,7 @@ class Route(BaseModel):
 # Augment the llm with schema for structured output
 route = llm.with_structured_output(Route)
 
+
 # State
 class State(TypedDict):
     input: str
@@ -34,7 +35,7 @@ class State(TypedDict):
 def llm_call_1(state: State):
     """Write a story"""
     result = llm.invoke(state["input"])
-    
+
     return {"output": result.content}
 
 
@@ -54,16 +55,19 @@ def llm_call_3(state: State):
 
 def llm_call_router(state: State):
     """Route the input to the appropriate node."""
-    
+
     # Run the augmented llm with structured output to serve as routing logic
     decision = route.invoke(
         [
-            SystemMessage(content="Route the input to story, joke or poem based on the user's request."),
-            HumanMessage(content=state["input"])
+            SystemMessage(
+                content="Route the input to story, joke or poem based on the user's request."
+            ),
+            HumanMessage(content=state["input"]),
         ]
     )
-    
+
     return {"decision": decision.step}
+
 
 # Conditional edge function to route to the appropriate node
 def route_decision(state: State):
@@ -91,8 +95,8 @@ router_builder.add_conditional_edges(
     {
         "llm_call_1": "llm_call_1",
         "llm_call_2": "llm_call_2",
-        "llm_call_3": "llm_call_3"
-    }
+        "llm_call_3": "llm_call_3",
+    },
 )
 
 router_builder.add_edge("llm_call_1", END)
