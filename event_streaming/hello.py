@@ -86,3 +86,19 @@ for event in stream:
     namespace = event["params"]["namespace"]
     print(namespace, event["method"], event["params"]["data"])
 
+
+for event in stream:
+    if event["method"] != "messages":
+        continue
+    data = event["params"]["data"][0]
+    
+    if not isinstance(data, dict):
+        continue
+    if data.get("event") != "content-block-delta":
+        continue
+    block = data.get("delta") or {}
+    if block.get("type") == "text-delta":
+        print(block.get("text", ""), end="", flush=True)
+    elif block.get("type") == "reasoning-delta":
+        print(f"[thinking]{block.get('reasoning', '')}", end="", flush=True)
+        
