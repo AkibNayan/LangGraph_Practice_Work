@@ -60,3 +60,6 @@ print(initial.interrupts)
 resumed = graph.stream_events(Command(resume=True), config=config, version="v3")
 
 print(resumed.output["status"])
+
+with open("approve_or_rejected.png", "wb") as f:
+    f.write(graph.get_graph().draw_mermaid_png())
